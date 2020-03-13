@@ -48,6 +48,27 @@ def ml_loop():
         if not ball_served:
             comm.send_instruction(scene_info.frame, PlatformAction.SERVE_TO_LEFT)
             ball_served = True
+
+        # platform adjastment starts when the Y gap between platform and ball is 300
+        elif ((scene_info.platform[1] - scene_info.ball[1]) <= 300):
+            # calculate the where center should be through reflection theorem
+            center_should_be = abs(scene_info.ball[0] - (scene_info.platform[1] - scene_info.ball[1]))
+
+            # setoff is set to be on the center of platform
+            # if platform's X is not equal to the "center_should_be", move it to either right and left
+            if (scene_info.platform[0] > center_should_be):
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
+                    
+            elif (scene_info.platform[0] < center_should_be):
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
+
+        # reset the platform to original position to gain more time for following moves
+        elif (scene_info.platform[0] != 75):
+            if (scene_info.platform[0] > 75):
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
+            elif (scene_info.platform[0] < 75):
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
+
         else:
-            comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
+            comm.send_instruction(scene_info.frame, PlatformAction.NONE)
             
